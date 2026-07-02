@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Credit Risk Portfolio Overview</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#132A3A;
+    --ink-soft:#3B5468;
+    --bg:#F3F5F7;
+    --panel:#FFFFFF;
+    --line:#E1E6EA;
+    --low:#2F9E62;
+    --mid:#E8A93B;
+    --high:#D6603D;
+    --severe:#B23A3A;
+    --accent:#1F6F5C;
+    --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+    --font-body: 'Inter', 'Segoe UI', sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg);
+    font-family:var(--font-body);
+    color:var(--ink);
+    padding:28px;
+  }
+  .wrap{max-width:1280px; margin:0 auto;}
+
+  header{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    margin-bottom:22px; padding-bottom:18px; border-bottom:2px solid var(--ink);
+  }
+  .brand-eyebrow{
+    font-family:var(--font-display); font-size:12px; letter-spacing:2.5px;
+    text-transform:uppercase; color:var(--accent); font-weight:600; margin-bottom:6px;
+  }
+  h1{ font-family:var(--font-display); font-size:28px; font-weight:700; letter-spacing:-0.3px;}
+  .subtitle{color:var(--ink-soft); font-size:13.5px; margin-top:4px;}
+  .meta{ text-align:right; font-size:12px; color:var(--ink-soft); line-height:1.6;}
+  .meta b{color:var(--ink);}
+
+  .kpi-row{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:20px;
+  }
+  .kpi{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px;
+    padding:16px 18px; position:relative; overflow:hidden;
+  }
+  .kpi::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--accent);
+  }
+  .kpi.warn::before{background:var(--high);}
+  .kpi-label{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-soft); font-weight:600;}
+  .kpi-value{font-family:var(--font-display); font-size:26px; font-weight:700; margin-top:6px;}
+  .kpi-sub{font-size:11.5px; color:var(--ink-soft); margin-top:3px;}
+
+  .grid{
+    display:grid; grid-template-columns:1.3fr 1fr; gap:14px;
+  }
+  .grid-3{
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:14px;
+  }
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px 18px 10px;
+  }
+  .panel-title{
+    font-family:var(--font-display); font-size:13.5px; font-weight:700; margin-bottom:2px;
+  }
+  .panel-note{font-size:11px; color:var(--ink-soft); margin-bottom:10px;}
+  .chart-box{position:relative; height:230px;}
+  .chart-box.tall{height:260px;}
+
+  .legend-strip{
+    display:flex; gap:14px; align-items:center; font-size:11px; color:var(--ink-soft);
+    margin-top:8px; padding-top:8px; border-top:1px dashed var(--line);
+  }
+  .legend-dot{width:9px; height:9px; border-radius:2px; display:inline-block; margin-right:5px;}
+
+  footer{
+    margin-top:22px; padding-top:14px; border-top:1px solid var(--line);
+    font-size:11px; color:var(--ink-soft); display:flex; justify-content:space-between;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="brand-eyebrow">AI Credit Risk Decision Engine</div>
+      <h1>Credit Risk Portfolio Overview</h1>
+      <div class="subtitle">Applicant-level default risk, drivers, and portfolio composition — 5,000 loan applications</div>
+    </div>
+    <div class="meta">
+      Data source: <b>credit_risk_sample_data.csv</b><br>
+      Rows: <b>5,000</b> · Fields: <b>15</b><br>
+      Model target: <b>default (0/1)</b>
+    </div>
+  </header>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-label">Total Applications</div>
+      <div class="kpi-value">5,000</div>
+      <div class="kpi-sub">Full sample portfolio</div>
+    </div>
+    <div class="kpi warn">
+      <div class="kpi-label">Overall Default Rate</div>
+      <div class="kpi-value">22.9%</div>
+      <div class="kpi-sub">1,147 of 5,000 defaulted</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg. Credit Score</div>
+      <div class="kpi-value">597</div>
+      <div class="kpi-sub">Portfolio skews subprime</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg. Debt-to-Income</div>
+      <div class="kpi-value">31.6%</div>
+      <div class="kpi-sub">Across all applicants</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg. Loan Amount</div>
+      <div class="kpi-value">$15,371</div>
+      <div class="kpi-sub">Avg. income: $44,984</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-title">Default Rate by Credit Utilization</div>
+      <div class="panel-note">Strongest single driver in the portfolio — default rate rises almost linearly with utilization</div>
+      <div class="chart-box tall"><canvas id="utilChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Default Rate by Delinquencies (last 2 yrs)</div>
+      <div class="panel-note">Each prior delinquency compounds risk sharply</div>
+      <div class="chart-box tall"><canvas id="delinqChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="panel">
+      <div class="panel-title">Default Rate by Credit Score Band</div>
+      <div class="chart-box"><canvas id="scoreChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Default Rate by Debt-to-Income</div>
+      <div class="chart-box"><canvas id="dtiChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Default Rate by Applicant Age</div>
+      <div class="chart-box"><canvas id="ageChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="panel">
+      <div class="panel-title">Default Rate by Loan Purpose</div>
+      <div class="chart-box"><canvas id="purposeChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Default Rate by Home Ownership</div>
+      <div class="chart-box"><canvas id="homeChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Default Rate by Loan Term</div>
+      <div class="chart-box"><canvas id="termChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="legend-strip">
+    <span><span class="legend-dot" style="background:var(--low)"></span>Low risk</span>
+    <span><span class="legend-dot" style="background:var(--mid)"></span>Moderate</span>
+    <span><span class="legend-dot" style="background:var(--high)"></span>Elevated</span>
+    <span><span class="legend-dot" style="background:var(--severe)"></span>Severe</span>
+  </div>
+
+  <footer>
+    <span>Prepared as part of the AI Credit Risk Decision Engine project · Exploratory portfolio analysis</span>
+    <span>Bars colored by relative default-rate severity within each chart</span>
+  </footer>
+
+</div>
+
+<script>
+Chart.defaults.font.family = "Inter, sans-serif";
+Chart.defaults.color = "#3B5468";
+Chart.defaults.font.size = 11;
+
+function riskColor(v, max){
+  const r = v/max;
+  if(r < 0.25) return getComputedStyle(document.documentElement).getPropertyValue('--low');
+  if(r < 0.5) return getComputedStyle(document.documentElement).getPropertyValue('--mid');
+  if(r < 0.75) return getComputedStyle(document.documentElement).getPropertyValue('--high');
+  return getComputedStyle(document.documentElement).getPropertyValue('--severe');
+}
+
+function makeBar(id, labels, data, horizontal=false, suffix='%'){
+  const max = Math.max(...data);
+  const colors = data.map(v => riskColor(v, max));
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors,
+        borderRadius: 3,
+        maxBarThickness: horizontal ? 16 : 34
+      }]
+    },
+    options: {
+      indexAxis: horizontal ? 'y' : 'x',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display:false },
+        tooltip: {
+          callbacks: { label: (ctx)=> ctx.parsed[horizontal?'x':'y'] + suffix + ' default rate' }
+        }
+      },
+      scales: {
+        x: { grid:{ display: horizontal }, ticks:{ callback:(v)=> horizontal ? v+suffix : v } },
+        y: { grid:{ display: !horizontal, color:'#EEF1F3' }, ticks:{ callback:(v)=> !horizontal ? v+suffix : v } }
+      }
+    }
+  });
+}
+
+// Credit utilization bucket
+makeBar('utilChart', ['0-20%','20-40%','40-60%','60-80%','80-100%'], [10.0, 22.2, 42.8, 66.7, 100.0]);
+
+// Delinquencies
+makeBar('delinqChart', ['0','1','2','3','4','5','6'], [5.2, 11.7, 21.7, 31.6, 42.8, 58.9, 72.0]);
+
+// Credit score band
+makeBar('scoreChart', ['Poor\n<580','Fair\n580-669','Good\n670-739','Very Good\n740+'], [38.2, 15.9, 3.0, 0.0]);
+
+// DTI bucket
+makeBar('dtiChart', ['0-10%','10-20%','20-30%','30-40%','40-50%','50%+'], [14.7, 13.2, 18.9, 23.1, 31.5, 43.5]);
+
+// Age bucket
+makeBar('ageChart', ['18-25','26-35','36-45','46-55','56-65','65+'], [44.0, 28.6, 21.7, 14.0, 9.6, 10.8]);
+
+// Loan purpose (horizontal)
+makeBar('purposeChart', ['Small Business','Debt Consolidation','Other','Major Purchase','Credit Card','Medical','Home Improvement'],
+  [25.8, 23.3, 23.0, 22.9, 22.5, 21.8, 21.6], true);
+
+// Home ownership
+makeBar('homeChart', ['Own','Rent','Mortgage'], [24.8, 23.0, 22.3]);
+
+// Loan term
+makeBar('termChart', ['12 mo','24 mo','36 mo','48 mo','60 mo'], [32.0, 24.8, 22.7, 19.1, 20.2]);
+</script>
+</body>
+</html>
